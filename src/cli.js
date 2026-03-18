@@ -28,4 +28,50 @@ function writeFile(destPath, content) {
   fs.writeFileSync(destPath, content, 'utf8');
 }
 
-module.exports = { checkDestination, writeFile };
+/**
+ * @param {string} url
+ * @param {number} timeoutMs
+ * @param {object} [transport] - injectable for testing (defaults to https)
+ * @returns {Promise<string>}
+ */
+function fetchFile(url, timeoutMs, transport) {
+  const protocol = transport || (url.startsWith('https') ? https : http);
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const settle = (fn, val) => {
+      if (!settled) { settled = true; fn(val); }
+    };
+
+    const req = protocol.get(url, (res) => {
+      if (res.statusCode !== 200) {
+        settle(reject, new Error(`HTTP ${res.statusCode}`));
+        res.resume();
+        return;
+      }
+      let data = '';
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        if (!data.trim()) {
+          settle(reject, new Error('EMPTY'));
+          return;
+        }
+        settle(resolve, data);
+      });
+    });
+
+    let timedOut = false;
+    req.setTimeout(timeoutMs, () => {
+      timedOut = true;
+      req.destroy();
+      // Reject immediately on timeout — don't wait for error event
+      settle(reject, new Error('TIMEOUT'));
+    });
+
+    req.on('error', (err) => {
+      if (timedOut) settle(reject, new Error('TIMEOUT'));
+      else settle(reject, err);
+    });
+  });
+}
+
+module.exports = { checkDestination, writeFile, fetchFile };
