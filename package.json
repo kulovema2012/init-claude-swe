@@ -1,0 +1,18 @@
+{
+  "name": "init-claude-swe",
+  "version": "1.0.0",
+  "description": "npx CLI that fetches and installs CLAUDE.md into any project",
+  "license": "MIT",
+  "type": "commonjs",
+  "engines": { "node": ">=18" },
+  "bin": { "init-claude-swe": "./bin/index.js" },
+  "files": ["bin/", "src/"],
+  "scripts": {
+    "test": "bun test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kulovema2012/init-claude-swe.git"
+  },
+  "keywords": ["claude", "ai", "boilerplate", "setup", "swe"]
+}
