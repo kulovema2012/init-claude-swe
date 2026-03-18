@@ -38,8 +38,13 @@ function fetchFile(url, timeoutMs, transport) {
   const protocol = transport || (url.startsWith('https') ? https : http);
   return new Promise((resolve, reject) => {
     let settled = false;
+    let timer = null;
     const settle = (fn, val) => {
-      if (!settled) { settled = true; fn(val); }
+      if (!settled) {
+        settled = true;
+        if (timer) clearTimeout(timer);
+        fn(val);
+      }
     };
 
     const req = protocol.get(url, (res) => {
@@ -59,16 +64,13 @@ function fetchFile(url, timeoutMs, transport) {
       });
     });
 
-    let timedOut = false;
-    req.setTimeout(timeoutMs, () => {
-      timedOut = true;
+    // Use global setTimeout (reliable cross-platform) instead of req.setTimeout
+    timer = setTimeout(() => {
       req.destroy();
-      // Reject immediately on timeout — don't wait for error event
       settle(reject, new Error('TIMEOUT'));
-    });
+    }, timeoutMs);
 
     req.on('error', (err) => {
-      // settled guard prevents double-rejection if timeout already fired
       settle(reject, err);
     });
   });
