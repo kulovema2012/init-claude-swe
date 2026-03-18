@@ -68,8 +68,8 @@ function fetchFile(url, timeoutMs, transport) {
     });
 
     req.on('error', (err) => {
-      if (timedOut) settle(reject, new Error('TIMEOUT'));
-      else settle(reject, err);
+      // settled guard prevents double-rejection if timeout already fired
+      settle(reject, err);
     });
   });
 }
