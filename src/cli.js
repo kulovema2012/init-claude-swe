@@ -20,4 +20,12 @@ function checkDestination(destPath) {
   return { exists: true, isDir: stat.isDirectory() };
 }
 
-module.exports = { checkDestination };
+/**
+ * @param {string} destPath
+ * @param {string} content
+ */
+function writeFile(destPath, content) {
+  fs.writeFileSync(destPath, content, 'utf8');
+}
+
+module.exports = { checkDestination, writeFile };
