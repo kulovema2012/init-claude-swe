@@ -123,15 +123,13 @@ function promptOverwrite() {
 
 async function run(argv) {
   // Resolve template
-  let templateName = parseTemplate(argv || []);
-  if (!templateName) {
-    templateName = process.stdin.isTTY ? await promptTemplate() : 'default';
-  }
+  let templateName = parseTemplate(argv || []) || 'default';
 
-  if (!TEMPLATES[templateName]) {
-    process.stderr.write(
-      `Unknown template "${templateName}". Available: ${Object.keys(TEMPLATES).join(', ')}\n`
-    );
+  if (templateName === 'interactive') {
+    templateName = process.stdin.isTTY ? await promptTemplate() : 'default';
+  } else if (!TEMPLATES[templateName]) {
+    const available = [...Object.keys(TEMPLATES), 'interactive'].join(', ');
+    process.stderr.write(`Unknown template "${templateName}". Available: ${available}\n`);
     process.exit(1);
   }
 

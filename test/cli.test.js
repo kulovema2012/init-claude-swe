@@ -89,6 +89,15 @@ describe('parseTemplate', () => {
     expect(result).toBe('ml');
   });
 
+  test('returns "interactive" when --template interactive is passed', () => {
+    // Arrange
+    const argv = ['node', 'index.js', '--template', 'interactive'];
+    // Act
+    const result = parseTemplate(argv);
+    // Assert
+    expect(result).toBe('interactive');
+  });
+
   test('returns null when --template flag is absent', () => {
     // Arrange
     const argv = ['node', 'index.js'];
