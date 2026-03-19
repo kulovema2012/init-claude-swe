@@ -5,7 +5,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const { checkDestination, writeFile, fetchFile } = require('../src/cli');
+const { checkDestination, writeFile, fetchFile, parseTemplate } = require('../src/cli');
 
 describe('checkDestination', () => {
   let tmpDir;
@@ -76,6 +76,44 @@ describe('writeFile', () => {
     writeFile(target, 'new content');
     // Assert
     expect(fs.readFileSync(target, 'utf8')).toBe('new content');
+  });
+});
+
+describe('parseTemplate', () => {
+  test('returns template name when --template flag is present', () => {
+    // Arrange
+    const argv = ['node', 'index.js', '--template', 'ml'];
+    // Act
+    const result = parseTemplate(argv);
+    // Assert
+    expect(result).toBe('ml');
+  });
+
+  test('returns null when --template flag is absent', () => {
+    // Arrange
+    const argv = ['node', 'index.js'];
+    // Act
+    const result = parseTemplate(argv);
+    // Assert
+    expect(result).toBeNull();
+  });
+
+  test('returns null when --template flag has no value', () => {
+    // Arrange
+    const argv = ['node', 'index.js', '--template'];
+    // Act
+    const result = parseTemplate(argv);
+    // Assert
+    expect(result).toBeNull();
+  });
+
+  test('returns null when --template value starts with dash', () => {
+    // Arrange
+    const argv = ['node', 'index.js', '--template', '--other'];
+    // Act
+    const result = parseTemplate(argv);
+    // Assert
+    expect(result).toBeNull();
   });
 });
 

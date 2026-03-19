@@ -6,8 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
-const RAW_URL =
-  'https://raw.githubusercontent.com/kulovema2012/init-claude-swe/main/CLAUDE.md';
+const { TEMPLATES } = require('./templates');
 const TIMEOUT_MS = 10000;
 
 /**
@@ -64,7 +63,6 @@ function fetchFile(url, timeoutMs, transport) {
       });
     });
 
-    // Use global setTimeout (reliable cross-platform) instead of req.setTimeout
     timer = setTimeout(() => {
       req.destroy();
       settle(reject, new Error('TIMEOUT'));
@@ -77,8 +75,38 @@ function fetchFile(url, timeoutMs, transport) {
 }
 
 /**
- * Prompts the user in a TTY environment.
- * @returns {Promise<boolean>} true if user confirms overwrite
+ * Parses --template <name> from process.argv.
+ * @param {string[]} argv
+ * @returns {string|null}
+ */
+function parseTemplate(argv) {
+  const idx = argv.indexOf('--template');
+  if (idx !== -1 && argv[idx + 1] && !argv[idx + 1].startsWith('-')) {
+    return argv[idx + 1];
+  }
+  return null;
+}
+
+/**
+ * Shows a numbered menu and returns the chosen template name.
+ * @returns {Promise<string>}
+ */
+function promptTemplate() {
+  const names = Object.keys(TEMPLATES);
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const list = names.map((n, i) => `  ${i + 1}) ${n}`).join('\n');
+    rl.question(`Select a template:\n${list}\nEnter number [1]: `, (answer) => {
+      rl.close();
+      const idx = parseInt(answer, 10) - 1;
+      resolve((idx >= 0 && idx < names.length) ? names[idx] : 'default');
+    });
+  });
+}
+
+/**
+ * Prompts the user to confirm overwriting an existing file.
+ * @returns {Promise<boolean>}
  */
 function promptOverwrite() {
   return new Promise((resolve) => {
@@ -93,7 +121,21 @@ function promptOverwrite() {
   });
 }
 
-async function run() {
+async function run(argv) {
+  // Resolve template
+  let templateName = parseTemplate(argv || []);
+  if (!templateName) {
+    templateName = process.stdin.isTTY ? await promptTemplate() : 'default';
+  }
+
+  if (!TEMPLATES[templateName]) {
+    process.stderr.write(
+      `Unknown template "${templateName}". Available: ${Object.keys(TEMPLATES).join(', ')}\n`
+    );
+    process.exit(1);
+  }
+
+  const url = TEMPLATES[templateName];
   const dest = path.join(process.cwd(), 'CLAUDE.md');
   const { exists, isDir } = checkDestination(dest);
 
@@ -116,7 +158,7 @@ async function run() {
 
   let content;
   try {
-    content = await fetchFile(RAW_URL, TIMEOUT_MS);
+    content = await fetchFile(url, TIMEOUT_MS);
   } catch (err) {
     if (err.message === 'TIMEOUT') {
       process.stderr.write('Request timed out. Check your internet connection.\n');
@@ -137,7 +179,7 @@ async function run() {
     process.exit(1);
   }
 
-  process.stdout.write('✓ CLAUDE.md added to your project.\n');
+  process.stdout.write(`✓ CLAUDE.md added to your project. (${templateName} template)\n`);
 }
 
-module.exports = { checkDestination, writeFile, fetchFile, run };
+module.exports = { checkDestination, writeFile, fetchFile, parseTemplate, promptTemplate, run };

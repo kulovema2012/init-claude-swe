@@ -2,7 +2,7 @@
 'use strict';
 
 const { run } = require('../src/cli');
-run().catch((err) => {
+run(process.argv).catch((err) => {
   process.stderr.write((err && err.message ? err.message : String(err)) + '\n');
   process.exit(1);
 });
