@@ -9,8 +9,8 @@ jobs:
   bump:
     runs-on: ubuntu-latest
 
-    # Skip if this push was made by the bot (prevents infinite loop)
-    if: "github.actor != 'github-actions[bot]'"
+    # Skip if this commit was already made by the version-bump bot
+    if: "!startsWith(github.event.head_commit.message, 'chore(release)')"
 
     steps:
       - name: Checkout
@@ -25,7 +25,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Bump patch version
-        run: npm version patch -m "chore(release): bump version to %s"
+        run: |
+          npm version patch -m "chore(release): v%s"
 
       - name: Push version commit and tag
         run: git push origin main --tags
