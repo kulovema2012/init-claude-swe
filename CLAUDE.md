@@ -38,7 +38,7 @@ CRITICAL RULE: Every logical change MUST be committed and pushed immediately.
 │  2. Run tests: uv run pytest OR bun test                    │
 │  3. Run linter: uvx ruff check OR bunx eslint               │
 │  4. Stage files: git add <specific-files>                     │
-│  5. Commit: git commit -m "type(scope): description"          │
+│  5. Commit: git commit -m "Emoji type(scope): description"          │
 │  6. Push IMMEDIATELY: git push                                │
 │  7. ONLY THEN move to next task                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -53,13 +53,20 @@ Violations (NEVER do this):
 Required commit-push cycle:
 Change → Test → Lint → Commit → Push → Next Change
 
-Commit Message Format:
-- feat(scope): add new feature
-- fix(scope): fix bug description
-- refactor(scope): improvement description
-- docs: documentation update
-- test(scope): add/update tests
-- chore: maintenance tasks
+### Commit Message Format (Gitmoji Standard)
+Every commit must be prefixed with a single, relevant emoji for high-speed scannability:
+
+- ✨ feat(scope): add new feature
+- 🐛 fix(scope): fix bug description
+- ♻️ refactor(scope): improvement description
+- 📝 docs: documentation update
+- ✅ test(scope): add/update tests
+- 🔧 chore: maintenance tasks
+- ⚡ perf: performance improvements
+- 🎨 style: formatting, missing semi-colons, etc.
+- 🧪 experiment: non-production code/testing ideas
+
+Example: git commit -m "✨ feat(auth): add bun-native password hashing"
 
 ## 5. MCP & Tool & Agent Orchestration
 - Task Triage: Assess the request domain before acting. Identify if the task is UI/UX, Backend Logic, Database Architecture, or DevOps.
