@@ -7,7 +7,7 @@ const path = require('path');
 const readline = require('readline');
 
 const RAW_URL =
-  'https://raw.githubusercontent.com/kulovema2012/init-claude-swe/master/CLAUDE.md';
+  'https://raw.githubusercontent.com/kulovema2012/init-claude-swe/main/CLAUDE.md';
 const TIMEOUT_MS = 10000;
 
 /**
