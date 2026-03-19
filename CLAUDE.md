@@ -89,7 +89,9 @@ Invoke skills BEFORE any response when there's even a 1% chance they apply:
 | New features or bugfixes (code) | superpowers:test-driven-development |
 | 2+ independent tasks in parallel | superpowers:dispatching-parallel-agents |
 
-### Sub-Agents
+### Agent Selection
+Explore the project and task first, then explore the agents available inside the project and select the one most appropriate to the task. Spawn an agent-team if the task contains many steps or high complexity.
+
 | Agent | When to Use |
 |-------|-------------|
 | Explore | Codebase exploration, finding files, understanding architecture |
