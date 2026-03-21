@@ -169,103 +169,154 @@
       animation: fadeUp 0.6s ease 0.2s both;
     }
 
-    /* ── Install card ── */
-    .install-card {
-      display: inline-flex;
-      flex-direction: column;
-      gap: 0;
-      background: var(--glass-bg);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+    /* ── Live demo terminal ── */
+    .demo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s ease 0.3s both;
+    }
+    .demo-terminal {
+      width: 100%;
+      max-width: 580px;
+      background: rgba(6, 10, 18, 0.75);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
       border: 1px solid var(--glass-bd);
       border-radius: 16px;
       overflow: hidden;
-      margin-bottom: 16px;
-      animation: fadeUp 0.6s ease 0.3s both;
       box-shadow:
-        0 0 0 1px rgba(0,212,255,0.06),
-        0 24px 64px rgba(0,0,0,0.4),
+        0 0 0 1px rgba(0,212,255,0.07),
+        0 32px 80px rgba(0,0,0,0.55),
         inset 0 1px 0 rgba(255,255,255,0.07);
     }
-    .install-bar {
+    .demo-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 16px;
-      background: rgba(255,255,255,0.03);
+      padding: 11px 16px;
+      background: rgba(255,255,255,0.025);
       border-bottom: 1px solid var(--glass-bd);
     }
-    .install-dots { display: flex; gap: 6px; }
-    .install-dots span {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: var(--text-3);
-    }
-    .install-dots span:nth-child(1) { background: #ff5f57; }
-    .install-dots span:nth-child(2) { background: #ffbd2e; }
-    .install-dots span:nth-child(3) { background: #28c840; }
-    .install-label {
+    .demo-dots { display: flex; gap: 6px; }
+    .demo-dots span { width: 10px; height: 10px; border-radius: 50%; }
+    .demo-dots span:nth-child(1) { background: #ff5f57; }
+    .demo-dots span:nth-child(2) { background: #ffbd2e; }
+    .demo-dots span:nth-child(3) { background: #28c840; }
+    .demo-title {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       color: var(--text-3);
     }
-    .install-body {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 20px 24px;
-      min-width: 480px;
-    }
-    .install-prompt {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--text-3);
-    }
-    .install-cmd {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 15px;
-      color: var(--text-1);
-      flex: 1;
-      text-align: left;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-    .install-cmd .cmd-npx { color: var(--cyan); }
-    .install-cmd .cmd-pkg { color: var(--amber); }
-    .install-cmd .cursor {
-      display: inline-block;
-      width: 2px; height: 1em;
-      background: var(--cyan);
-      vertical-align: text-bottom;
-      animation: blink 1.1s step-end infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-    .copy-btn {
+    .demo-copy {
       background: none;
       border: 1px solid var(--glass-bd);
-      border-radius: 8px;
-      padding: 6px 12px;
-      color: var(--text-2);
+      border-radius: 6px;
+      padding: 4px 10px;
+      color: var(--text-3);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-size: 10px;
       cursor: pointer;
       transition: all 0.2s;
-      white-space: nowrap;
     }
-    .copy-btn:hover {
-      background: var(--glass-hover);
-      border-color: var(--glass-bd-h);
-      color: var(--text-1);
+    .demo-copy:hover { color: var(--text-1); border-color: var(--glass-bd-h); background: var(--glass-hover); }
+    .demo-copy.copied { color: var(--green); border-color: rgba(16,185,129,0.4); }
+
+    .demo-body {
+      padding: 20px 22px 24px;
+      min-height: 180px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.9;
     }
-    .copy-btn.copied {
-      border-color: rgba(16,185,129,0.4);
-      color: var(--green);
+    .demo-line { display: flex; align-items: flex-start; gap: 10px; }
+    .demo-prompt { color: var(--text-3); flex-shrink: 0; padding-top: 1px; }
+    .demo-text   { color: var(--text-1); word-break: break-all; }
+    .demo-text .c { color: var(--cyan); }
+    .demo-text .a { color: var(--amber); }
+    .demo-text .g { color: var(--green); }
+    .demo-text .d { color: var(--text-3); }
+    .demo-text .p { color: var(--purple); }
+
+    .demo-cursor {
+      display: inline-block;
+      width: 7px; height: 14px;
+      background: var(--cyan);
+      vertical-align: middle;
+      margin-left: 1px;
+      border-radius: 1px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* progress bar */
+    .demo-progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-left: 20px;
+    }
+    .demo-progress-track {
+      flex: 1;
+      height: 3px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .demo-progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      transition: width 0.08s linear;
+      box-shadow: 0 0 8px var(--cyan);
+    }
+    .demo-progress-pct {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--cyan);
+      min-width: 32px;
+      text-align: right;
     }
 
+    /* success flash */
+    .demo-success {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      margin: 6px 0 2px;
+      background: rgba(16, 185, 129, 0.07);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--green);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .demo-success.show { opacity: 1; transform: translateY(0); }
+    .demo-success-icon { font-size: 15px; }
+
+    /* template badge in demo */
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 10px;
+      margin-left: 6px;
+      border: 1px solid;
+    }
+
+    /* variant chips */
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
     .install-variants {
       display: flex;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
       animation: fadeUp 0.6s ease 0.4s both;
     }
@@ -280,11 +331,12 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .variant-chip:hover {
+    .variant-chip:hover, .variant-chip.active {
       background: var(--glass-hover);
       color: var(--text-1);
       border-color: var(--glass-bd-h);
     }
+    .variant-chip.active { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
     .variant-chip .chip-flag { color: var(--cyan); }
     .variant-chip .chip-val  { color: var(--amber); }
 
@@ -566,48 +618,33 @@
       No config. No signup. Just run and code.
     </p>
 
-    <!-- Install card -->
-    <div class="install-card" id="install-card">
-      <div class="install-bar">
-        <div class="install-dots">
-          <span></span><span></span><span></span>
+    <!-- Live demo terminal -->
+    <div class="demo-wrap">
+      <div class="demo-terminal" id="demo-terminal">
+        <div class="demo-bar">
+          <div class="demo-dots"><span></span><span></span><span></span></div>
+          <span class="demo-title">terminal — live demo</span>
+          <button class="demo-copy" id="demo-copy-btn" onclick="demoCopy()" aria-label="Copy command">copy</button>
         </div>
-        <span class="install-label">terminal</span>
-        <div style="width:48px"></div>
-      </div>
-      <div class="install-body">
-        <span class="install-prompt">❯</span>
-        <span class="install-cmd" id="install-cmd">
-          <span class="cmd-npx">npx</span> <span class="cmd-pkg">init-claude-swe</span><span class="cursor"></span>
-        </span>
-        <button class="copy-btn" id="copy-btn" onclick="copyCmd()" aria-label="Copy command">copy</button>
+        <div class="demo-body" id="demo-body">
+          <div class="demo-line">
+            <span class="demo-prompt">❯</span>
+            <span class="demo-text" id="demo-cmd-text"><span class="demo-cursor"></span></span>
+          </div>
+          <div id="demo-output"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Variant chips -->
-    <div class="install-variants">
-      <div class="variant-chip" onclick="setCmd('npx init-claude-swe')">default</div>
-      <div class="variant-chip" onclick="setCmd('npx init-claude-swe --template interactive')">
-        <span class="chip-flag">--template</span> <span class="chip-val">interactive</span>
-      </div>
-      <div class="variant-chip" onclick="setCmd('npx init-claude-swe --template ml')">
-        <span class="chip-flag">--template</span> <span class="chip-val">ml</span>
-      </div>
-      <div class="variant-chip" onclick="setCmd('npx init-claude-swe --template ai')">
-        <span class="chip-flag">--template</span> <span class="chip-val">ai</span>
-      </div>
-      <div class="variant-chip" onclick="setCmd('npx init-claude-swe --template backend')">
-        <span class="chip-flag">--template</span> <span class="chip-val">backend</span>
-      </div>
-      <div class="variant-chip" onclick="setCmd('npx init-claude-swe --template devsecops')">
-        <span class="chip-flag">--template</span> <span class="chip-val">devsecops</span>
-      </div>
-      <div class="variant-chip" onclick="setCmd('npx init-claude-swe --template mlsecops')">
-        <span class="chip-flag">--template</span> <span class="chip-val">mlsecops</span>
-      </div>
-      <div class="variant-chip" onclick="setCmd('npx init-claude-swe --template fullstack')">
-        <span class="chip-flag">--template</span> <span class="chip-val">fullstack</span>
-      </div>
+    <!-- Template chips -->
+    <div class="install-variants" id="variant-chips">
+      <div class="variant-chip active" onclick="demoPlay(0)">default</div>
+      <div class="variant-chip" onclick="demoPlay(1)"><span class="chip-flag">--template</span> <span class="chip-val">ml</span></div>
+      <div class="variant-chip" onclick="demoPlay(2)"><span class="chip-flag">--template</span> <span class="chip-val">ai</span></div>
+      <div class="variant-chip" onclick="demoPlay(3)"><span class="chip-flag">--template</span> <span class="chip-val">backend</span></div>
+      <div class="variant-chip" onclick="demoPlay(4)"><span class="chip-flag">--template</span> <span class="chip-val">devsecops</span></div>
+      <div class="variant-chip" onclick="demoPlay(5)"><span class="chip-flag">--template</span> <span class="chip-val">mlsecops</span></div>
+      <div class="variant-chip" onclick="demoPlay(6)"><span class="chip-flag">--template</span> <span class="chip-val">fullstack</span></div>
     </div>
   </div>
 </section>
@@ -789,33 +826,190 @@
 </footer>
 
 <script>
-  // ── Copy to clipboard ──
-  function copyCmd() {
-    const cmd = document.getElementById('install-cmd').dataset.cmd || 'npx init-claude-swe';
+  // ── Template definitions ──
+  const TEMPLATES = [
+    { key: 'default',   cmd: 'npx init-claude-swe',                      icon: '🏗️', label: 'Principal SWE',        color: '#00d4ff' },
+    { key: 'ml',        cmd: 'npx init-claude-swe --template ml',         icon: '🧠', label: 'Machine Learning',     color: '#8b5cf6' },
+    { key: 'ai',        cmd: 'npx init-claude-swe --template ai',         icon: '🤖', label: 'AI / LLM Engineering', color: '#f59e0b' },
+    { key: 'backend',   cmd: 'npx init-claude-swe --template backend',    icon: '⚙️', label: 'Backend Engineering',  color: '#10b981' },
+    { key: 'devsecops', cmd: 'npx init-claude-swe --template devsecops',  icon: '🛡️', label: 'DevSecOps',            color: '#f87171' },
+    { key: 'mlsecops',  cmd: 'npx init-claude-swe --template mlsecops',   icon: '🔒', label: 'MLSecOps',             color: '#fb923c' },
+    { key: 'fullstack', cmd: 'npx init-claude-swe --template fullstack',  icon: '🌐', label: 'Fullstack',            color: '#a78bfa' },
+  ];
+
+  let currentDemo = 0;
+  let autoTimer = null;
+  let animTimers = [];
+
+  function clearTimers() {
+    animTimers.forEach(clearTimeout);
+    animTimers = [];
+  }
+
+  function schedule(fn, delay) {
+    const t = setTimeout(fn, delay);
+    animTimers.push(t);
+    return t;
+  }
+
+  // ── Type text character by character ──
+  function typeText(el, text, speed, done) {
+    let i = 0;
+    function next() {
+      if (i <= text.length) {
+        el.innerHTML = text.slice(0, i) + '<span class="demo-cursor"></span>';
+        i++;
+        schedule(next, speed + (Math.random() * 30 - 15));
+      } else {
+        el.innerHTML = text;
+        if (done) done();
+      }
+    }
+    next();
+  }
+
+  // ── Animate progress bar ──
+  function animateProgress(fill, pct, done) {
+    let current = 0;
+    function tick() {
+      current = Math.min(current + 2 + Math.random() * 4, 100);
+      fill.style.width = current + '%';
+      pct.textContent = Math.floor(current) + '%';
+      if (current < 100) {
+        schedule(tick, 28);
+      } else {
+        fill.style.width = '100%';
+        pct.textContent = '100%';
+        schedule(done, 300);
+      }
+    }
+    tick();
+  }
+
+  // ── Append a plain output line ──
+  function appendLine(container, html) {
+    const div = document.createElement('div');
+    div.style.fontFamily = "'JetBrains Mono', monospace";
+    div.style.fontSize = '12px';
+    div.style.color = 'var(--text-3)';
+    div.style.paddingLeft = '20px';
+    div.style.lineHeight = '1.9';
+    div.innerHTML = html;
+    container.appendChild(div);
+    return div;
+  }
+
+  // ── Play demo for template index ──
+  function demoPlay(idx, auto) {
+    clearTimers();
+    if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+
+    currentDemo = idx;
+    const tpl = TEMPLATES[idx];
+
+    // Update active chip
+    document.querySelectorAll('.variant-chip').forEach((c, i) => c.classList.toggle('active', i === idx));
+
+    // Update terminal border glow color
+    const terminal = document.getElementById('demo-terminal');
+    terminal.style.boxShadow = `0 0 0 1px ${tpl.color}18, 0 32px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07)`;
+
+    // Reset output area
+    const cmdEl  = document.getElementById('demo-cmd-text');
+    const outEl  = document.getElementById('demo-output');
+    cmdEl.innerHTML = '<span class="demo-cursor"></span>';
+    outEl.innerHTML = '';
+
+    // Store raw command for copy button
+    terminal.dataset.cmd = tpl.cmd;
+
+    // ── Phase 1: type the command ──
+    const displayCmd = tpl.cmd
+      .replace('npx', `<span class="c">npx</span>`)
+      .replace('init-claude-swe', `<span class="a">init-claude-swe</span>`)
+      .replace('--template', `<span class="c">--template</span>`)
+      .replace(/ (ml|ai|backend|devsecops|mlsecops|fullstack)$/, ` <span class="a">$1</span>`);
+
+    let t = 400;
+    schedule(() => {
+      typeText(cmdEl, displayCmd, 42, () => {
+
+        // ── Phase 2: resolution lines ──
+        schedule(() => {
+          appendLine(outEl, `<span style="color:var(--text-3)">Need to install the following packages:</span>`);
+          schedule(() => {
+            appendLine(outEl, `<span style="color:var(--cyan)">  init-claude-swe@1.0.7</span>`);
+            schedule(() => {
+              appendLine(outEl, `<span style="color:var(--text-3)">Ok to proceed? (y)</span>`);
+
+              // ── Phase 3: progress bar ──
+              schedule(() => {
+                const wrap = document.createElement('div');
+                wrap.className = 'demo-progress-wrap';
+                const track = document.createElement('div');
+                track.className = 'demo-progress-track';
+                const fill = document.createElement('div');
+                fill.className = 'demo-progress-fill';
+                fill.style.background = `linear-gradient(90deg, ${tpl.color}, var(--purple))`;
+                fill.style.boxShadow = `0 0 8px ${tpl.color}`;
+                track.appendChild(fill);
+                const pct = document.createElement('div');
+                pct.className = 'demo-progress-pct';
+                pct.style.color = tpl.color;
+                pct.textContent = '0%';
+                wrap.appendChild(track);
+                wrap.appendChild(pct);
+                outEl.appendChild(wrap);
+
+                animateProgress(fill, pct, () => {
+                  // ── Phase 4: fetching line ──
+                  appendLine(outEl, `<span style="color:var(--text-3)">  Fetching </span><span style="color:${tpl.color}">${tpl.key}</span><span style="color:var(--text-3)"> template from GitHub...</span>`);
+
+                  // ── Phase 5: success banner ──
+                  schedule(() => {
+                    const success = document.createElement('div');
+                    success.className = 'demo-success';
+                    success.innerHTML = `
+                      <span class="demo-success-icon">✓</span>
+                      <span>CLAUDE.md added to your project.</span>
+                      <span class="demo-badge" style="color:${tpl.color};border-color:${tpl.color}44;background:${tpl.color}12">
+                        ${tpl.icon} ${tpl.key}
+                      </span>`;
+                    outEl.appendChild(success);
+                    schedule(() => success.classList.add('show'), 50);
+
+                    // ── Phase 6: next prompt appears ──
+                    schedule(() => {
+                      const nextLine = document.createElement('div');
+                      nextLine.className = 'demo-line';
+                      nextLine.style.marginTop = '8px';
+                      nextLine.innerHTML = `<span class="demo-prompt" style="color:var(--text-3)">❯</span> <span><span class="demo-cursor"></span></span>`;
+                      outEl.appendChild(nextLine);
+
+                      // ── Auto-advance to next template ──
+                      autoTimer = setTimeout(() => {
+                        demoPlay((idx + 1) % TEMPLATES.length, true);
+                      }, 3200);
+                    }, 1200);
+                  }, 500);
+                });
+              }, 500);
+            }, 300);
+          }, 200);
+        }, 180);
+      });
+    }, t);
+  }
+
+  // ── Copy current command ──
+  function demoCopy() {
+    const cmd = document.getElementById('demo-terminal').dataset.cmd || 'npx init-claude-swe';
     navigator.clipboard.writeText(cmd).then(() => {
-      const btn = document.getElementById('copy-btn');
+      const btn = document.getElementById('demo-copy-btn');
       btn.textContent = 'copied!';
       btn.classList.add('copied');
       setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
     });
-  }
-
-  // ── Swap install command ──
-  const CMDS = {
-    'npx init-claude-swe': '<span class="cmd-npx">npx</span> <span class="cmd-pkg">init-claude-swe</span>',
-    'npx init-claude-swe --template interactive': '<span class="cmd-npx">npx</span> <span class="cmd-pkg">init-claude-swe</span> <span style="color:var(--cyan)">--template</span> <span style="color:var(--amber)">interactive</span>',
-    'npx init-claude-swe --template ml':        '<span class="cmd-npx">npx</span> <span class="cmd-pkg">init-claude-swe</span> <span style="color:var(--cyan)">--template</span> <span style="color:var(--amber)">ml</span>',
-    'npx init-claude-swe --template ai':        '<span class="cmd-npx">npx</span> <span class="cmd-pkg">init-claude-swe</span> <span style="color:var(--cyan)">--template</span> <span style="color:var(--amber)">ai</span>',
-    'npx init-claude-swe --template backend':   '<span class="cmd-npx">npx</span> <span class="cmd-pkg">init-claude-swe</span> <span style="color:var(--cyan)">--template</span> <span style="color:var(--amber)">backend</span>',
-    'npx init-claude-swe --template devsecops': '<span class="cmd-npx">npx</span> <span class="cmd-pkg">init-claude-swe</span> <span style="color:var(--cyan)">--template</span> <span style="color:var(--amber)">devsecops</span>',
-    'npx init-claude-swe --template mlsecops':  '<span class="cmd-npx">npx</span> <span class="cmd-pkg">init-claude-swe</span> <span style="color:var(--cyan)">--template</span> <span style="color:var(--amber)">mlsecops</span>',
-    'npx init-claude-swe --template fullstack': '<span class="cmd-npx">npx</span> <span class="cmd-pkg">init-claude-swe</span> <span style="color:var(--cyan)">--template</span> <span style="color:var(--amber)">fullstack</span>',
-  };
-
-  function setCmd(raw) {
-    const el = document.getElementById('install-cmd');
-    el.dataset.cmd = raw;
-    el.innerHTML = (CMDS[raw] || raw) + '<span class="cursor"></span>';
   }
 
   // ── Mouse-tracked glow on cards ──
@@ -825,16 +1019,25 @@
       card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
       card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
     });
+    // clicking a card also triggers the demo
+    card.addEventListener('click', () => {
+      const key = card.querySelector('.card-name').textContent.trim();
+      const idx = TEMPLATES.findIndex(t => t.key === key);
+      if (idx >= 0) { window.scrollTo({ top: 0, behavior: 'smooth' }); demoPlay(idx); }
+    });
   });
 
-  // ── Intersection observer for scroll-triggered animations ──
+  // ── Scroll-triggered card animations ──
   const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.style.animationPlayState = 'running'; } });
+    entries.forEach(e => { if (e.isIntersecting) e.target.style.animationPlayState = 'running'; });
   }, { threshold: 0.1 });
   document.querySelectorAll('.template-card, .step').forEach(el => {
     el.style.animationPlayState = 'paused';
     observer.observe(el);
   });
+
+  // ── Start demo on load ──
+  demoPlay(0);
 </script>
 </body>
 </html>
