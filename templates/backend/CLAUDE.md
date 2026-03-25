@@ -110,6 +110,85 @@ Explore the project and task first, then explore the agents available inside the
 1. Process skills first (brainstorming, debugging) — determine HOW to approach
 2. Implementation skills second — guide execution
 
+## 6. Project Structure & CLAUDE.md Organization
+
+### CLAUDE.md Scaling Rule
+Files over 200 lines reduce adherence. Split into `.claude/rules/` — one topic per file. All `.md` files are discovered recursively, so organize into subdirectories:
+
+```
+.claude/
+├── CLAUDE.md          # Keep < 200 lines
+└── rules/
+    ├── code-style.md  # Global (flat)
+    ├── frontend/      # Domain subdirectory
+    │   └── components.md
+    └── backend/
+        └── api-design.md
+```
+
+Use `@path` imports to reference rule files.
+
+### Pointer Architecture (Co-located Rules)
+Local `rule.md` files act as **routers only** — they point to descriptive files co-located with source code, never contain rules themselves:
+
+```
+apps/
+├── web-frontend/
+│   ├── component-styling.md   # UI rules
+│   ├── react-conventions.md   # Component rules
+│   └── src/
+└── api-server/
+    ├── api-response-shapes.md # API rules
+    └── src/
+```
+
+Example (`apps/web-frontend/api-response-shapes.md`):
+```
+# Directory Context: Web Frontend
+When modifying UI elements, read component-styling.md.
+When modifying state or hooks, read react-conventions.md.
+```
+
+### Path-Specific Rules
+Scope rules to files using YAML frontmatter — only applies when working with matching paths:
+
+```yaml
+---
+paths:
+  - "src/api/**/*.ts"
+  - "src/**/*.{ts,tsx}"
+---
+```
+
+Rules without `paths` apply globally. Supported glob patterns: `**/*.ts`, `src/**/*`, `*.md`.
+
+### Standard Monorepo Anatomy
+
+```
+my-monorepo/
+├── .env                 # Local dev only (never commit)
+├── .env.example         # Committed template
+├── package.json         # Root workspace & global dev tools
+├── turbo.json           # Build/test caching
+├── apps/                # DEPLOYABLE END-PRODUCTS
+│   ├── web-frontend/
+│   │   ├── .env.local   # App-specific secrets
+│   │   └── src/
+│   └── api-server/
+│       ├── .env         # Server secrets (JWT, etc.)
+│       └── src/
+└── packages/            # SHARED LIBRARIES (no .env here)
+    ├── ui-components/
+    ├── database/        # Schema + exported client
+    ├── config/          # ESLint, tsconfig.base.json
+    └── utils/           # Shared helpers
+```
+
+### .env Strategy
+- **Root**: Local dev scaffolding only (Docker DB URLs). Never commit.
+- **App level**: Production & app-specific secrets, scoped per app.
+- **Package level**: No `.env` files — packages are env-agnostic; consuming apps inject config via parameters.
+
 ## Formatting Your Response
 - Think step-by-step. Briefly explain the **Why** (design rationale, security implication) before providing the code.
 - Prioritize the single most optimal, secure, and accurate solution. Never provide multiple mediocre alternatives.
