@@ -94,17 +94,31 @@ Invoke skills BEFORE any response when there's even a 1% chance they apply:
 | 2+ independent tasks in parallel | superpowers:dispatching-parallel-agents |
 
 ### Agent Selection
-Explore the project and task first, then explore the agents available inside the project and select the one most appropriate to the task. Spawn an agent-team if the task contains many steps or high complexity.
+Explore the project and task first, then explore the agents available inside the project and select the one most appropriate to the task. **Spawn an agent-team whenever the implementation involves 3+ tasks, multiple files, or parallel workstreams.**
 
 | Agent | When to Use |
 |-------|-------------|
 | Explore | Codebase exploration, finding files, understanding architecture |
 | Plan | Designing implementation strategies, architectural decisions |
 | general-purpose | Complex multi-step research or tasks not covered by specialists |
+| **agent-teams (team-spawn)** | **3+ independent implementation tasks, multi-file features, or parallel workstreams** |
+
+#### Agent-Team Dispatch Rules
+**REQUIRED** — use `superpowers:dispatching-parallel-agents` + `agent-teams:team-spawn` when:
+- Implementing a feature with 3+ distinct tasks
+- Tasks span multiple files or domains (frontend + backend + tests)
+- Tasks have no sequential dependency (can run in parallel)
+
+**Workflow:**
+1. Invoke `superpowers:brainstorming` → identify all subtasks
+2. Invoke `superpowers:dispatching-parallel-agents` → split into parallel work
+3. Invoke `agent-teams:team-spawn` with preset (e.g. `feature`, `fullstack`, `review`) → dispatch team
+4. Monitor via `agent-teams:team-status`; shut down via `agent-teams:team-shutdown`
 
 ### Priority Order
 1. Process skills first (brainstorming, debugging) — determine HOW to approach
-2. Implementation skills second — guide execution
+2. If 3+ tasks → dispatch agent-team before any implementation
+3. Implementation skills second — guide execution
 
 ## 6. Project Structure & CLAUDE.md Organization
 
