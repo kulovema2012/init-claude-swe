@@ -42,8 +42,10 @@ function fetchFile(url, timeoutMs, transport) {
     });
 
     timer = setTimeout(() => {
-      req.destroy();
-      settle(reject, new Error('TIMEOUT'));
+      if (!settled) {
+        req.destroy();
+        settle(reject, new Error('TIMEOUT'));
+      }
     }, timeoutMs);
 
     req.on('error', (err) => {
