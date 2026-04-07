@@ -1,183 +1,53 @@
 'use strict';
 
-const https = require('https');
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const readline = require('readline');
-
-const { TEMPLATES } = require('./templates');
-const TIMEOUT_MS = 10000;
+const { Command } = require('commander');
+const { install } = require('./commands/install');
+const pkg = require('../package.json');
 
 /**
- * @param {string} destPath
- * @returns {{ exists: boolean, isDir: boolean }}
+ * Create and configure the commander program.
+ * @returns {Command}
  */
-function checkDestination(destPath) {
-  if (!fs.existsSync(destPath)) return { exists: false, isDir: false };
-  const stat = fs.statSync(destPath);
-  return { exists: true, isDir: stat.isDirectory() };
-}
+function createProgram() {
+  const program = new Command();
 
-/**
- * @param {string} destPath
- * @param {string} content
- */
-function writeFile(destPath, content) {
-  fs.writeFileSync(destPath, content, 'utf8');
-}
+  program
+    .name('init-claude-swe')
+    .description('Fetch and install CLAUDE.md templates into any project')
+    .version(pkg.version);
 
-/**
- * @param {string} url
- * @param {number} timeoutMs
- * @param {object} [transport] - injectable for testing (defaults to https)
- * @returns {Promise<string>}
- */
-function fetchFile(url, timeoutMs, transport) {
-  const protocol = transport || (url.startsWith('https') ? https : http);
-  return new Promise((resolve, reject) => {
-    let settled = false;
-    let timer = null;
-    const settle = (fn, val) => {
-      if (!settled) {
-        settled = true;
-        if (timer) clearTimeout(timer);
-        fn(val);
+  program
+    .command('install', { isDefault: true })
+    .description('Install a CLAUDE.md template (default command)')
+    .option('-t, --template <name>', 'Template to install', 'default')
+    .option('-s, --scope <scope>', 'Scope: project or local', 'project')
+    .action(async (opts) => {
+      try {
+        const result = await install({
+          scope: opts.scope,
+          templateName: opts.template,
+          cwd: process.cwd(),
+          isTTY: !!process.stdin.isTTY,
+        });
+        process.stdout.write(
+          `✓ ${result.filename} added to your project. (${result.templateName} template, ${result.scope} scope)\n`
+        );
+      } catch (err) {
+        process.stderr.write(err.message + '\n');
+        process.exit(1);
       }
-    };
-
-    const req = protocol.get(url, (res) => {
-      if (res.statusCode !== 200) {
-        settle(reject, new Error(`HTTP ${res.statusCode}`));
-        res.resume();
-        return;
-      }
-      let data = '';
-      res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => {
-        if (!data.trim()) {
-          settle(reject, new Error('EMPTY'));
-          return;
-        }
-        settle(resolve, data);
-      });
     });
 
-    timer = setTimeout(() => {
-      req.destroy();
-      settle(reject, new Error('TIMEOUT'));
-    }, timeoutMs);
-
-    req.on('error', (err) => {
-      settle(reject, err);
-    });
-  });
+  return program;
 }
 
 /**
- * Parses --template <name> from process.argv.
+ * Main entry point — parses argv and runs the appropriate command.
  * @param {string[]} argv
- * @returns {string|null}
  */
-function parseTemplate(argv) {
-  const idx = argv.indexOf('--template');
-  if (idx !== -1 && argv[idx + 1] && !argv[idx + 1].startsWith('-')) {
-    return argv[idx + 1];
-  }
-  return null;
-}
-
-/**
- * Shows a numbered menu and returns the chosen template name.
- * @returns {Promise<string>}
- */
-function promptTemplate() {
-  const names = Object.keys(TEMPLATES);
-  return new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    const list = names.map((n, i) => `  ${i + 1}) ${n}`).join('\n');
-    rl.question(`Select a template:\n${list}\nEnter number [1]: `, (answer) => {
-      rl.close();
-      const idx = parseInt(answer, 10) - 1;
-      resolve((idx >= 0 && idx < names.length) ? names[idx] : 'default');
-    });
-  });
-}
-
-/**
- * Prompts the user to confirm overwriting an existing file.
- * @returns {Promise<boolean>}
- */
-function promptOverwrite() {
-  return new Promise((resolve) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-    rl.question('CLAUDE.md already exists. Overwrite? (y/N) ', (answer) => {
-      rl.close();
-      resolve(answer === 'y' || answer === 'Y');
-    });
-  });
-}
-
 async function run(argv) {
-  // Resolve template
-  let templateName = parseTemplate(argv || []) || 'default';
-
-  if (templateName === 'interactive') {
-    templateName = process.stdin.isTTY ? await promptTemplate() : 'default';
-  } else if (!TEMPLATES[templateName]) {
-    const available = [...Object.keys(TEMPLATES), 'interactive'].join(', ');
-    process.stderr.write(`Unknown template "${templateName}". Available: ${available}\n`);
-    process.exit(1);
-  }
-
-  const url = TEMPLATES[templateName];
-  const dest = path.join(process.cwd(), 'CLAUDE.md');
-  const { exists, isDir } = checkDestination(dest);
-
-  if (isDir) {
-    process.stderr.write('CLAUDE.md is a directory. Aborting.\n');
-    process.exit(1);
-  }
-
-  if (exists) {
-    if (!process.stdin.isTTY) {
-      process.stderr.write('Non-interactive environment. Aborting.\n');
-      process.exit(0);
-    }
-    const overwrite = await promptOverwrite();
-    if (!overwrite) {
-      process.stdout.write('Aborted.\n');
-      process.exit(0);
-    }
-  }
-
-  let content;
-  try {
-    content = await fetchFile(url, TIMEOUT_MS);
-  } catch (err) {
-    if (err.message === 'TIMEOUT') {
-      process.stderr.write('Request timed out. Check your internet connection.\n');
-    } else if (err.message.startsWith('HTTP ')) {
-      process.stderr.write(`Failed to fetch CLAUDE.md. ${err.message}\n`);
-    } else if (err.message === 'EMPTY') {
-      process.stderr.write('Fetched CLAUDE.md is empty. Aborting.\n');
-    } else {
-      process.stderr.write('Failed to fetch CLAUDE.md. Check your internet connection.\n');
-    }
-    process.exit(1);
-  }
-
-  try {
-    writeFile(dest, content);
-  } catch (err) {
-    process.stderr.write(err.message + '\n');
-    process.exit(1);
-  }
-
-  process.stdout.write(`✓ CLAUDE.md added to your project. (${templateName} template)\n`);
+  const program = createProgram();
+  await program.parseAsync(argv);
 }
 
-module.exports = { checkDestination, writeFile, fetchFile, parseTemplate, promptTemplate, run };
+module.exports = { createProgram, run };
