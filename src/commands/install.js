@@ -28,14 +28,14 @@ async function install(opts) {
   const cwd = opts.cwd || process.cwd();
   const isTTY = opts.isTTY !== undefined ? opts.isTTY : !!process.stdin.isTTY;
 
-  // Resolve scope
+  // Resolve scope — prompt if TTY and no scope provided, else default to project
   let scope = opts.scope;
-  if (!scope || !SCOPE_FILENAME[scope]) {
-    if (isTTY && scope === 'interactive') {
-      scope = await promptScope();
-    } else {
-      scope = scope && SCOPE_FILENAME[scope] ? scope : 'project';
-    }
+  if (scope && SCOPE_FILENAME[scope]) {
+    // Valid scope provided via flag — use it
+  } else if (isTTY) {
+    scope = await promptScope();
+  } else {
+    scope = 'project';
   }
 
   // Resolve template

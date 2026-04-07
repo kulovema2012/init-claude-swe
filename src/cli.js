@@ -20,7 +20,7 @@ function createProgram() {
     .command('install', { isDefault: true })
     .description('Install a CLAUDE.md template (default command)')
     .option('-t, --template <name>', 'Template to install', 'default')
-    .option('-s, --scope <scope>', 'Scope: project or local', 'project')
+    .option('-s, --scope <scope>', 'Scope: project or local')
     .action(async (opts) => {
       try {
         const result = await install({
