@@ -82,7 +82,7 @@ describe('install', () => {
     expect(fs.readFileSync(gitignore, 'utf8')).toContain('CLAUDE.md');
   });
 
-  test('does not touch .gitignore for project scope', async () => {
+  test('adds CLAUDE.md to .gitignore for project scope', async () => {
     // Arrange
     const templateName = 'default';
     // Act
@@ -96,7 +96,8 @@ describe('install', () => {
     });
     // Assert
     const gitignore = path.join(tmpDir, '.gitignore');
-    expect(fs.existsSync(gitignore)).toBe(false);
+    expect(fs.existsSync(gitignore)).toBe(true);
+    expect(fs.readFileSync(gitignore, 'utf8')).toContain('CLAUDE.md');
   });
 
   test('throws when file exists in non-interactive mode', async () => {

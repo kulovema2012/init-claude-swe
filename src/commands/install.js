@@ -93,10 +93,8 @@ async function install(opts) {
   // Write file
   fs.writeFileSync(dest, content, 'utf8');
 
-  // Handle .gitignore for local scope
-  if (scope === 'local') {
-    ensureGitignoreEntry(cwd, filename);
-  }
+  // Add CLAUDE.md to .gitignore
+  ensureGitignoreEntry(cwd, filename);
 
   return { filename, templateName, scope };
 }
