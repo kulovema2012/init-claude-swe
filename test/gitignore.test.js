@@ -21,9 +21,9 @@ describe('ensureGitignoreEntry', () => {
     // Arrange
     const gitignorePath = path.join(tmpDir, '.gitignore');
     // Act
-    ensureGitignoreEntry(tmpDir, 'CLAUDE.local.md');
+    ensureGitignoreEntry(tmpDir, 'CLAUDE.md');
     // Assert
-    expect(fs.readFileSync(gitignorePath, 'utf8')).toBe('CLAUDE.local.md\n');
+    expect(fs.readFileSync(gitignorePath, 'utf8')).toBe('CLAUDE.md\n');
   });
 
   test('appends entry to existing .gitignore', () => {
@@ -31,21 +31,21 @@ describe('ensureGitignoreEntry', () => {
     const gitignorePath = path.join(tmpDir, '.gitignore');
     fs.writeFileSync(gitignorePath, 'node_modules/\n');
     // Act
-    ensureGitignoreEntry(tmpDir, 'CLAUDE.local.md');
+    ensureGitignoreEntry(tmpDir, 'CLAUDE.md');
     // Assert
     const content = fs.readFileSync(gitignorePath, 'utf8');
-    expect(content).toBe('node_modules/\nCLAUDE.local.md\n');
+    expect(content).toBe('node_modules/\nCLAUDE.md\n');
   });
 
   test('does not duplicate if entry already exists', () => {
     // Arrange
     const gitignorePath = path.join(tmpDir, '.gitignore');
-    fs.writeFileSync(gitignorePath, 'node_modules/\nCLAUDE.local.md\n');
+    fs.writeFileSync(gitignorePath, 'node_modules/\nCLAUDE.md\n');
     // Act
-    ensureGitignoreEntry(tmpDir, 'CLAUDE.local.md');
+    ensureGitignoreEntry(tmpDir, 'CLAUDE.md');
     // Assert
     const content = fs.readFileSync(gitignorePath, 'utf8');
-    expect(content).toBe('node_modules/\nCLAUDE.local.md\n');
+    expect(content).toBe('node_modules/\nCLAUDE.md\n');
   });
 
   test('appends entry when .gitignore has no trailing newline', () => {
@@ -53,20 +53,20 @@ describe('ensureGitignoreEntry', () => {
     const gitignorePath = path.join(tmpDir, '.gitignore');
     fs.writeFileSync(gitignorePath, 'node_modules/');
     // Act
-    ensureGitignoreEntry(tmpDir, 'CLAUDE.local.md');
+    ensureGitignoreEntry(tmpDir, 'CLAUDE.md');
     // Assert
     const content = fs.readFileSync(gitignorePath, 'utf8');
-    expect(content).toBe('node_modules/\nCLAUDE.local.md\n');
+    expect(content).toBe('node_modules/\nCLAUDE.md\n');
   });
 
   test('detects entry in middle of file without duplicating', () => {
     // Arrange
     const gitignorePath = path.join(tmpDir, '.gitignore');
-    fs.writeFileSync(gitignorePath, 'node_modules/\nCLAUDE.local.md\ndist/\n');
+    fs.writeFileSync(gitignorePath, 'node_modules/\nCLAUDE.md\ndist/\n');
     // Act
-    ensureGitignoreEntry(tmpDir, 'CLAUDE.local.md');
+    ensureGitignoreEntry(tmpDir, 'CLAUDE.md');
     // Assert
     const content = fs.readFileSync(gitignorePath, 'utf8');
-    expect(content).toBe('node_modules/\nCLAUDE.local.md\ndist/\n');
+    expect(content).toBe('node_modules/\nCLAUDE.md\ndist/\n');
   });
 });

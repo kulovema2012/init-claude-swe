@@ -9,7 +9,7 @@ const { TEMPLATES } = require('../templates');
 
 const SCOPE_FILENAME = {
   project: 'CLAUDE.md',
-  local: 'CLAUDE.local.md',
+  local: 'CLAUDE.md',
 };
 
 /**

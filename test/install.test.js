@@ -46,7 +46,7 @@ describe('install', () => {
     expect(fs.readFileSync(dest, 'utf8')).toContain('Template content');
   });
 
-  test('writes CLAUDE.local.md for local scope', async () => {
+  test('writes CLAUDE.md for local scope', async () => {
     // Arrange
     const templateName = 'default';
     // Act
@@ -59,12 +59,12 @@ describe('install', () => {
       fetchPort: port,
     });
     // Assert
-    const dest = path.join(tmpDir, 'CLAUDE.local.md');
+    const dest = path.join(tmpDir, 'CLAUDE.md');
     expect(fs.existsSync(dest)).toBe(true);
     expect(fs.readFileSync(dest, 'utf8')).toContain('Template content');
   });
 
-  test('adds CLAUDE.local.md to .gitignore for local scope', async () => {
+  test('adds CLAUDE.md to .gitignore for local scope', async () => {
     // Arrange
     const templateName = 'default';
     // Act
@@ -79,7 +79,7 @@ describe('install', () => {
     // Assert
     const gitignore = path.join(tmpDir, '.gitignore');
     expect(fs.existsSync(gitignore)).toBe(true);
-    expect(fs.readFileSync(gitignore, 'utf8')).toContain('CLAUDE.local.md');
+    expect(fs.readFileSync(gitignore, 'utf8')).toContain('CLAUDE.md');
   });
 
   test('does not touch .gitignore for project scope', async () => {
