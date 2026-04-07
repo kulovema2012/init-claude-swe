@@ -1,6 +1,6 @@
 {
   "name": "init-claude-swe",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "npx CLI that fetches and installs CLAUDE.md into any project",
   "license": "MIT",
   "type": "commonjs",
