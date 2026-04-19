@@ -5,7 +5,10 @@ const BASE_URL =
 
 /**
  * Navigation tree. Each node: { label, slug, children? }
- * children: undefined = leaf node (goes straight to scope selection)
+ * children: undefined = leaf node (triggers scope selection immediately).
+ * Leaves may appear at depth 1 (e.g. General Purpose), depth 2 (e.g. Static/Jamstack),
+ * or depth 3 (e.g. Next.js App Router). Consumers MUST guard with node.children.
+ * Maximum supported depth is 3. prompt.js walks exactly 3 levels.
  */
 const TREE = [
   {
