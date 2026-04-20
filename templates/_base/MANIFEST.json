@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "files": [
+    ".claude/settings.json",
+    ".claude/rules/environment-isolation.md",
+    ".claude/rules/testing-aaa.md",
+    ".claude/rules/observability.md",
+    ".claude/rules/git-workflow.md",
+    ".claude/rules/project-organization.md",
+    ".claude/rules/tool-selection.md",
+    ".claude/rules/skills-catalog.md",
+    ".claude/rules/agents-catalog.md"
+  ]
+}
