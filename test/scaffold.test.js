@@ -39,6 +39,23 @@ describe('mergeManifests', () => {
     expect(map.has('CLAUDE.md')).toBe(true);
     expect(map.get('CLAUDE.md')).toBe('http://leaf/CLAUDE.md');
   });
+
+  test('returns empty map when both file lists are empty', () => {
+    // Arrange / Act
+    const map = mergeManifests([], [], 'http://base', 'http://leaf');
+    // Assert
+    expect(map.size).toBe(0);
+  });
+
+  test('normalises trailing slash in URLs', () => {
+    // Arrange
+    const baseFiles = ['CLAUDE.md'];
+    const leafFiles = [];
+    // Act
+    const map = mergeManifests(baseFiles, leafFiles, 'http://base/', 'http://leaf/');
+    // Assert
+    expect(map.get('CLAUDE.md')).toBe('http://base/CLAUDE.md');
+  });
 });
 
 describe('writeAll', () => {
@@ -84,5 +101,22 @@ describe('writeAll', () => {
     writeAll(contentMap, tmpDir, 'project');
     // Assert
     expect(fs.readFileSync(path.join(tmpDir, 'CLAUDE.md'), 'utf8')).toBe('# My Role Content');
+  });
+
+  test('does not rename CLAUDE.md for project scope', () => {
+    // Arrange
+    const contentMap = new Map([['CLAUDE.md', '# Role']]);
+    // Act
+    writeAll(contentMap, tmpDir, 'project');
+    // Assert
+    expect(fs.existsSync(path.join(tmpDir, 'CLAUDE.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, 'CLAUDE.local.md'))).toBe(false);
+  });
+
+  test('throws for unknown scope', () => {
+    // Arrange
+    const contentMap = new Map([['CLAUDE.md', '# Role']]);
+    // Act & Assert
+    expect(() => writeAll(contentMap, tmpDir, 'unknown')).toThrow('unknown scope');
   });
 });

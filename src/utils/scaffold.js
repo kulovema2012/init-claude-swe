@@ -13,12 +13,14 @@ const path = require('path');
  * @returns {Map<string, string>} Map<relativePath, fetchUrl>
  */
 function mergeManifests(baseFiles, leafFiles, baseUrl, leafUrl) {
+  const base = baseUrl.replace(/\/$/, '');
+  const leaf = leafUrl.replace(/\/$/, '');
   const map = new Map();
   for (const f of baseFiles) {
-    map.set(f, `${baseUrl}/${f}`);
+    map.set(f, `${base}/${f}`);
   }
   for (const f of leafFiles) {
-    map.set(f, `${leafUrl}/${f}`);
+    map.set(f, `${leaf}/${f}`);
   }
   return map;
 }
@@ -31,6 +33,10 @@ function mergeManifests(baseFiles, leafFiles, baseUrl, leafUrl) {
  * @param {string} scope - 'project' | 'local'
  */
 function writeAll(contentMap, cwd, scope) {
+  const VALID_SCOPES = new Set(['project', 'local']);
+  if (!VALID_SCOPES.has(scope)) {
+    throw new Error(`writeAll: unknown scope "${scope}". Expected "project" or "local".`);
+  }
   for (const [filePath, content] of contentMap) {
     const destPath =
       scope === 'local' && filePath === 'CLAUDE.md' ? 'CLAUDE.local.md' : filePath;
