@@ -114,8 +114,16 @@ describe('install', () => {
     const result = await install(makeOpts());
     // Assert
     expect(result.filename).toBe('CLAUDE.md');
+    expect(result.stackLabel).toBe('nextjs-app-router');
     expect(result.scope).toBe('project');
     expect(Array.isArray(result.filesWritten)).toBe(true);
     expect(result.filesWritten.length).toBeGreaterThan(0);
+  });
+
+  test('throws in non-interactive mode without category and scope flags', async () => {
+    // Arrange
+    const opts = { cwd: tmpDir, isTTY: false };
+    // Act & Assert
+    await expect(install(opts)).rejects.toThrow('Non-interactive mode requires');
   });
 });
