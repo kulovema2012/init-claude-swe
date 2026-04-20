@@ -152,4 +152,33 @@ describe('fetchFiles', () => {
     expect(calls).toHaveLength(2);
     expect(calls.every((c) => c.total === 2)).toBe(true);
   });
+
+  test('retries once on failure and returns content on success', async () => {
+    // Arrange — server fails first request to /retry.md, succeeds second
+    let attempts = 0;
+    const retryServer = http.createServer((req, res) => {
+      if (req.url === '/retry.md') {
+        attempts++;
+        if (attempts === 1) {
+          res.writeHead(500);
+          res.end('Internal Server Error');
+        } else {
+          res.writeHead(200);
+          res.end('retry-content');
+        }
+      }
+    });
+    await new Promise((resolve) => retryServer.listen(0, '127.0.0.1', resolve));
+    const retryPort = retryServer.address().port;
+
+    const urlMap = new Map([['retry.md', `http://127.0.0.1:${retryPort}/retry.md`]]);
+
+    // Act
+    const contentMap = await fetchFiles(urlMap, http);
+
+    // Assert
+    expect(contentMap.get('retry.md')).toBe('retry-content');
+
+    await new Promise((resolve) => retryServer.close(resolve));
+  });
 });

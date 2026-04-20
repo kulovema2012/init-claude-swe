@@ -76,7 +76,6 @@ async function fetchManifest(dirUrl, transport) {
 async function fetchFiles(urlMap, transport, onProgress) {
   const entries = [...urlMap.entries()];
   const total = entries.length;
-  let done = 0;
   const contentMap = new Map();
 
   await Promise.all(
@@ -84,13 +83,15 @@ async function fetchFiles(urlMap, transport, onProgress) {
       let content;
       try {
         content = await fetchFile(url, TIMEOUT_MS, transport);
-      } catch (_) {
-        // retry once
-        content = await fetchFile(url, TIMEOUT_MS, transport);
+      } catch (firstErr) {
+        try {
+          content = await fetchFile(url, TIMEOUT_MS, transport);
+        } catch (retryErr) {
+          throw new Error(`Failed to fetch ${filePath} after retry. First: ${firstErr.message}. Retry: ${retryErr.message}`);
+        }
       }
       contentMap.set(filePath, content);
-      done++;
-      if (onProgress) onProgress({ done, total, filePath });
+      if (onProgress) onProgress({ done: contentMap.size, total, filePath });
     })
   );
 
