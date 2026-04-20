@@ -13,17 +13,7 @@ describe('createProgram', () => {
     expect(installCmd).toBeDefined();
   });
 
-  test('has --template option on install', () => {
-    // Arrange
-    const program = createProgram();
-    const installCmd = program.commands.find((c) => c.name() === 'install');
-    // Act
-    const opts = installCmd.options.map((o) => o.long);
-    // Assert
-    expect(opts).toContain('--template');
-  });
-
-  test('has --scope option on install', () => {
+  test('has --scope option', () => {
     // Arrange
     const program = createProgram();
     const installCmd = program.commands.find((c) => c.name() === 'install');
@@ -31,5 +21,35 @@ describe('createProgram', () => {
     const opts = installCmd.options.map((o) => o.long);
     // Assert
     expect(opts).toContain('--scope');
+  });
+
+  test('has --yes option', () => {
+    // Arrange
+    const program = createProgram();
+    const installCmd = program.commands.find((c) => c.name() === 'install');
+    // Act
+    const opts = installCmd.options.map((o) => o.long);
+    // Assert
+    expect(opts).toContain('--yes');
+  });
+
+  test('has --category option', () => {
+    // Arrange
+    const program = createProgram();
+    const installCmd = program.commands.find((c) => c.name() === 'install');
+    // Act
+    const opts = installCmd.options.map((o) => o.long);
+    // Assert
+    expect(opts).toContain('--category');
+  });
+
+  test('has --stack option', () => {
+    // Arrange
+    const program = createProgram();
+    const installCmd = program.commands.find((c) => c.name() === 'install');
+    // Act
+    const opts = installCmd.options.map((o) => o.long);
+    // Assert
+    expect(opts).toContain('--stack');
   });
 });

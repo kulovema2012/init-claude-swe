@@ -4,33 +4,45 @@ const { Command } = require('commander');
 const { install } = require('./commands/install');
 const pkg = require('../package.json');
 
-/**
- * Create and configure the commander program.
- * @returns {Command}
- */
+async function getClack() {
+  return import('@clack/prompts');
+}
+
 function createProgram() {
   const program = new Command();
 
   program
     .name('init-claude-swe')
-    .description('Fetch and install CLAUDE.md templates into any project')
+    .description('Claude Code scaffold installer')
     .version(pkg.version);
 
   program
     .command('install', { isDefault: true })
-    .description('Install a CLAUDE.md template (default command)')
-    .option('-t, --template <name>', 'Template to install', 'default')
-    .option('-s, --scope <scope>', 'Scope: project or local')
+    .description('Scaffold .claude/ directory for your project')
+    .option('--category <category>', 'Category slug (CI mode)')
+    .option('--type <type>', 'Type slug (CI mode)')
+    .option('--stack <stack>', 'Stack slug (CI mode)')
+    .option('-s, --scope <scope>', 'Scope: project or local (CI mode)')
+    .option('-y, --yes', 'Skip overwrite confirmation')
     .action(async (opts) => {
+      const { intro, outro } = await getClack();
+      intro(`init-claude-swe  v${pkg.version} — Claude Code scaffold installer`);
       try {
         const result = await install({
+          category: opts.category,
+          type: opts.type,
+          stack: opts.stack,
           scope: opts.scope,
-          templateName: opts.template,
+          yes: opts.yes,
           cwd: process.cwd(),
           isTTY: !!process.stdin.isTTY,
         });
-        process.stdout.write(
-          `✓ ${result.filename} added to your project. (${result.templateName} template, ${result.scope} scope)\n`
+        outro(
+          `All done! Scaffold installed for ${result.stackLabel}.\n\n` +
+          `  Next steps:\n` +
+          `  1. Open Claude Code in this directory\n` +
+          `  2. Review CLAUDE.md for your role setup\n` +
+          `  3. Explore .claude/rules/ to customise your workflow`
         );
       } catch (err) {
         process.stderr.write(err.message + '\n');
@@ -41,10 +53,6 @@ function createProgram() {
   return program;
 }
 
-/**
- * Main entry point — parses argv and runs the appropriate command.
- * @param {string[]} argv
- */
 async function run(argv) {
   const program = createProgram();
   await program.parseAsync(argv);
