@@ -1,10 +1,9 @@
-# Environment & Isolation — React / Next.js Frontend
+# Environment & Isolation — React / Vite
 
 ## Gitignore
 ```
 node_modules/
 dist/
-.next/
 .env
 .env.local
 .claude/
@@ -19,9 +18,10 @@ Never use npm, yarn, or pnpm.
 
 ## Environment Variables
 ```
-NEXT_PUBLIC_API_URL=   # Backend API base URL
-NEXT_PUBLIC_APP_URL=   # App URL for redirects
+VITE_API_URL=          # Backend API base URL (exposed to browser)
+VITE_APP_URL=          # App URL for redirects (exposed to browser)
 ```
+Prefix client-side vars with `VITE_`. Server-side secrets go in `.env` without the prefix (not exposed).
 
 ## Worktree Isolation
 ```bash

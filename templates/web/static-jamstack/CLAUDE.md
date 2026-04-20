@@ -24,3 +24,4 @@ You prioritise build-time rendering, CDN-first deployment, and minimal JavaScrip
 - Zero client JS by default; hydrate islands with `client:load` only when needed
 - API routes only for form endpoints; all data fetching is build-time
 - Deploy to Netlify, Vercel, or Cloudflare Pages
+- Default commands assume Astro; for 11ty replace `bun run dev` with `bun run start`

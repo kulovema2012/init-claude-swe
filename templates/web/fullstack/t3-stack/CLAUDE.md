@@ -16,7 +16,9 @@ Next.js, tRPC, Prisma, NextAuth, and Tailwind. You prioritise end-to-end type sa
 - `bun run dev` — development server
 - `bun run build` — production build
 - `bun test` — Vitest unit tests
-- `bun run db:push` — push Prisma schema changes
+- `bun run db:generate` — generate Prisma migration files
+- `bun run db:migrate` — run migrations (production)
+- `bun run db:push` — sync schema directly (prototyping only, not for production)
 - `bun run db:studio` — open Prisma Studio
 - `bun run lint` — ESLint + TypeScript check
 

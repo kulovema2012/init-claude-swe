@@ -6,6 +6,7 @@ node_modules/
 .svelte-kit/
 build/
 .env
+.env.local
 .claude/
 ```
 
