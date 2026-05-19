@@ -21,8 +21,8 @@ const STATIC_FILES = [
  * Build the hook entries that wire up the installed scripts.
  * All paths are computed at runtime from the current user's home dir.
  */
-function buildHookEntries() {
-  const h = CLAUDE_HOME.replace(/\\/g, '/');
+function buildHookEntries(claudeHome = CLAUDE_HOME) {
+  const h = claudeHome.replace(/\\/g, '/');
   return {
     SessionStart: [
       {
@@ -92,16 +92,16 @@ function mergeHooks(existing, incoming) {
  * Merge our hook entries and statusLine into ~/.claude/settings.json.
  * Creates the file if it doesn't exist. Never overwrites existing keys.
  */
-function mergeSettings(results) {
-  const settingsPath = path.join(CLAUDE_HOME, 'settings.json');
-  const hookEntries = buildHookEntries();
+function mergeSettings(results, claudeHome = CLAUDE_HOME) {
+  const settingsPath = path.join(claudeHome, 'settings.json');
+  const hookEntries = buildHookEntries(claudeHome);
   const statusLine = {
     type: 'command',
-    command: `node ${CLAUDE_HOME.replace(/\\/g, '/')}/statusline.js`,
+    command: `node ${claudeHome.replace(/\\/g, '/')}/statusline.js`,
   };
 
   if (!fs.existsSync(settingsPath)) {
-    fs.mkdirSync(CLAUDE_HOME, { recursive: true });
+    fs.mkdirSync(claudeHome, { recursive: true });
     fs.writeFileSync(
       settingsPath,
       JSON.stringify({ hooks: hookEntries, statusLine }, null, 2) + '\n',
@@ -143,9 +143,9 @@ function mergeSettings(results) {
 /**
  * Copy a single file from templates/global → ~/.claude/ if destination is absent.
  */
-function installFile(relPath, results) {
-  const src = path.join(TEMPLATES_DIR, relPath);
-  const dest = path.join(CLAUDE_HOME, relPath);
+function installFile(relPath, results, claudeHome = CLAUDE_HOME, templatesDir = TEMPLATES_DIR) {
+  const src = path.join(templatesDir, relPath);
+  const dest = path.join(claudeHome, relPath);
 
   if (!fs.existsSync(src)) {
     results.errors.push(`${relPath} (template missing)`);
@@ -164,9 +164,9 @@ function installFile(relPath, results) {
  * Install each skill directory under templates/global/skills/ into ~/.claude/skills/.
  * Skips skills that already have a directory at the destination.
  */
-function installSkills(results) {
-  const srcSkillsDir = path.join(TEMPLATES_DIR, 'skills');
-  const destSkillsDir = path.join(CLAUDE_HOME, 'skills');
+function installSkills(results, claudeHome = CLAUDE_HOME, templatesDir = TEMPLATES_DIR) {
+  const srcSkillsDir = path.join(templatesDir, 'skills');
+  const destSkillsDir = path.join(claudeHome, 'skills');
 
   if (!fs.existsSync(srcSkillsDir)) return;
 
@@ -197,16 +197,18 @@ function installSkills(results) {
  * @returns {{ installed: string[], skipped: string[], errors: string[] }}
  */
 async function setupGlobal(opts = {}) {
+  const claudeHome = opts._claudeHome || CLAUDE_HOME;
+  const templatesDir = opts._templatesDir || TEMPLATES_DIR;
   const results = { installed: [], skipped: [], errors: [] };
 
-  fs.mkdirSync(CLAUDE_HOME, { recursive: true });
+  fs.mkdirSync(claudeHome, { recursive: true });
 
   for (const relPath of STATIC_FILES) {
-    installFile(relPath, results);
+    installFile(relPath, results, claudeHome, templatesDir);
   }
 
-  installSkills(results);
-  mergeSettings(results);
+  installSkills(results, claudeHome, templatesDir);
+  mergeSettings(results, claudeHome);
 
   if (opts.withBinaries) {
     const binResults = await checkAndInstallBinaries(opts.yes);
