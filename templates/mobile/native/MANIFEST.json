@@ -1,0 +1,7 @@
+{
+  "version": "1.0",
+  "files": [
+    "CLAUDE.md",
+    ".claude/rules/environment-isolation.md"
+  ]
+}

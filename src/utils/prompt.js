@@ -1,65 +1,83 @@
 'use strict';
 
-const readline = require('readline');
-const { TEMPLATES } = require('../templates');
+const { TREE } = require('../navigation');
 
 /**
- * Prompt the user to select a scope.
- * @param {{ simulate?: string }} [opts] - test injection: bypasses readline
- * @returns {Promise<string>} "project" or "local"
+ * Run multi-level category/type/stack + scope prompts via @clack/prompts.
+ * In simulate mode, returns opts.simulate directly (for testing and CI).
+ * @param {object} [opts]
+ * @param {{ slugs: string[], scope: string }} [opts.simulate] - bypass clack for testing
+ * @returns {Promise<{ slugs: string[], scope: string }>}
  */
-function promptScope(opts) {
-  if (opts && opts.simulate !== undefined) {
-    const answer = opts.simulate.trim();
-    return Promise.resolve(answer === '2' ? 'local' : 'project');
+async function promptSelections(opts = {}) {
+  if (opts.simulate !== undefined) return opts.simulate;
+
+  const { select, isCancel, cancel } = await import('@clack/prompts');
+
+  function check(result) {
+    if (isCancel(result)) {
+      cancel('Operation cancelled.');
+      process.exit(0);
+    }
+    return result;
   }
-  return new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    rl.question('Select scope:\n  1) project\n  2) local\nEnter number [1]: ', (answer) => {
-      rl.close();
-      resolve(answer.trim() === '2' ? 'local' : 'project');
-    });
-  });
+
+  const slugs = [];
+
+  // Level 1: Category
+  const catSlug = check(await select({
+    message: 'What are you building?',
+    options: TREE.map((n) => ({ value: n.slug, label: n.label })),
+  }));
+  slugs.push(catSlug);
+  const catNode = TREE.find((n) => n.slug === catSlug);
+
+  if (catNode && catNode.children) {
+    // Level 2: Sub-type
+    const typeSlug = check(await select({
+      message: 'Project type?',
+      options: catNode.children.map((n) => ({ value: n.slug, label: n.label })),
+    }));
+    slugs.push(typeSlug);
+    const typeNode = catNode.children.find((n) => n.slug === typeSlug);
+
+    if (typeNode && typeNode.children) {
+      // Level 3: Stack
+      const stackSlug = check(await select({
+        message: 'Stack?',
+        options: typeNode.children.map((n) => ({ value: n.slug, label: n.label })),
+      }));
+      slugs.push(stackSlug);
+    }
+  }
+
+  // Scope selection
+  const scope = check(await select({
+    message: 'Install scope?',
+    options: [
+      { value: 'project', label: 'project', hint: 'CLAUDE.md — committed to git' },
+      { value: 'local', label: 'local', hint: 'CLAUDE.local.md — gitignored' },
+    ],
+  }));
+
+  return { slugs, scope };
 }
 
 /**
- * Prompt the user to select a template.
- * @param {{ simulate?: string }} [opts] - test injection: bypasses readline
- * @returns {Promise<string>} template name
- */
-function promptTemplate(opts) {
-  const names = Object.keys(TEMPLATES);
-  if (opts && opts.simulate !== undefined) {
-    const idx = parseInt(opts.simulate, 10) - 1;
-    return Promise.resolve((idx >= 0 && idx < names.length) ? names[idx] : 'default');
-  }
-  return new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    const list = names.map((n, i) => `  ${i + 1}) ${n}`).join('\n');
-    rl.question(`Select a template:\n${list}\nEnter number [1]: `, (answer) => {
-      rl.close();
-      const idx = parseInt(answer, 10) - 1;
-      resolve((idx >= 0 && idx < names.length) ? names[idx] : 'default');
-    });
-  });
-}
-
-/**
- * Prompt the user to confirm overwriting an existing file.
- * @param {{ simulate?: string }} [opts] - test injection: bypasses readline
+ * Prompt to confirm overwriting existing files.
+ * @param {object} [opts]
+ * @param {boolean} [opts.simulate] - bypass clack for testing
  * @returns {Promise<boolean>}
  */
-function promptOverwrite(opts) {
-  if (opts && opts.simulate !== undefined) {
-    return Promise.resolve(opts.simulate === 'y' || opts.simulate === 'Y');
+async function promptOverwrite(opts = {}) {
+  if (opts.simulate !== undefined) return opts.simulate;
+  const { confirm, isCancel, cancel } = await import('@clack/prompts');
+  const result = await confirm({ message: 'Files already exist — overwrite?' });
+  if (isCancel(result)) {
+    cancel('Operation cancelled.');
+    process.exit(0);
   }
-  return new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    rl.question('File already exists. Overwrite? (y/N) ', (answer) => {
-      rl.close();
-      resolve(answer === 'y' || answer === 'Y');
-    });
-  });
+  return result;
 }
 
-module.exports = { promptScope, promptTemplate, promptOverwrite };
+module.exports = { promptSelections, promptOverwrite };
